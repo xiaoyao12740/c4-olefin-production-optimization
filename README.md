@@ -1,136 +1,167 @@
-# C4 Olefin Production Optimization
+# C4 烯烃生产优化 / C4 Olefin Production Optimization
 
-基于 MATLAB 的乙醇偶合制备 C4 烯烃统计回归分析与工艺优化项目。
+<p align="center"><strong>拟合温度、催化剂组合、乙醇转化率与 C4 烯烃选择性之间的关系，并搜索产率较优的反应条件。</strong><br>A modeling workflow that relates temperature and catalyst formulation to ethanol conversion and C4-olefin selectivity, then searches for favorable yield conditions.</p>
 
-## 项目简介
+<p align="center">![Tech](https://img.shields.io/badge/stack-MATLAB-2563eb) ![Docs](https://img.shields.io/badge/docs-中文%20%7C%20English-16a34a) ![Status](https://img.shields.io/badge/status-portfolio--ready-f59e0b)</p>
 
-本项目围绕“乙醇偶合制备 C4 烯烃”问题展开，利用 MATLAB 对实验数据进行整理、回归建模与优化分析，研究催化剂组合、乙醇浓度和温度等因素对乙醇转化率、C4 烯烃选择性及收率的影响，并进一步寻找较优工艺条件。
+<p align="center"><a href="#中文说明">中文</a> · <a href="#english">English</a> · <a href="#结果展示--results">结果展示 / Results</a> · <a href="#复现--reproduction">复现 / Reproduction</a></p>
 
-项目主要完成了以下几部分工作：
+## 中文说明
 
-1. 对不同催化剂组合下的实验数据进行分组处理；
-2. 分析温度与乙醇转化率、C4 烯烃选择性之间的关系；
-3. 建立多元线性回归模型，研究多因素对反应结果的影响；
-4. 构建 C4 烯烃收率模型，并在有无温度约束条件下进行优化求解；
-5. 根据优化结果提出补充实验设计方案。
+### 项目定位
 
-## 研究问题
+拟合温度、催化剂组合、乙醇转化率与 C4 烯烃选择性之间的关系，并搜索产率较优的反应条件。 本仓库强调“问题—方法—代码—结果”的对应关系，适合作为课程作业、算法练习或建模研究的可复现档案。
 
-项目主要对应以下几个分析任务：
+### 核心方法
 
-- **问题一**：研究不同催化剂组合下，温度与乙醇转化率、C4 烯烃选择性之间的关系；
-- **问题二**：分析催化剂组合及温度对乙醇转化率和 C4 烯烃选择性的影响大小；
-- **问题三**：在给定实验范围内，寻找使 C4 烯烃收率尽可能高的催化剂组合与温度条件；
-- **问题四**：基于模型预测结果，设计补充实验方案以验证与改进模型。:contentReference[oaicite:1]{index=1}
+- 多候选回归模型比较 / candidate regression-model comparison
+- 催化剂分组拟合 / catalyst-group fitting
+- 转化率×选择性的产率优化 / yield optimization from conversion and selectivity
 
-## 方法说明
+## English
 
-本项目主要使用了以下方法：
+### Positioning
 
-- **分组数据预处理**
-  - 按催化剂组别提取实验数据；
-  - 解析催化剂描述中的关键变量，如 Co 负载量、Co/SiO2 质量、HAP 质量、乙醇浓度等。
+A modeling workflow that relates temperature and catalyst formulation to ethanol conversion and C4-olefin selectivity, then searches for favorable yield conditions. The repository keeps the problem statement, implementation, and outputs close together so the work can be inspected and reproduced.
 
-- **多项式回归拟合**
-  - 对每组数据分别比较线性、二次、三次和指数模型；
-  - 使用 \(R^2\) 评价拟合效果；
-  - 对乙醇转化率与 C4 烯烃选择性分别建立温度拟合模型。
+### What is demonstrated
 
-- **多元线性回归分析**
-  - 以 Co 负载量、Co/SiO2 质量、HAP 质量、乙醇浓度、温度为自变量；
-  - 以乙醇转化率和 C4 烯烃选择性为因变量；
-  - 分析各因素影响方向及相对重要性。
+- 多候选回归模型比较 / candidate regression-model comparison
+- 催化剂分组拟合 / catalyst-group fitting
+- 转化率×选择性的产率优化 / yield optimization from conversion and selectivity
 
-- **收率优化**
-  - 根据“乙醇转化率 × C4 烯烃选择性”构造 C4 烯烃收率；
-  - 建立一次与二次回归模型；
-  - 在无温度约束和温度小于 350℃ 两种条件下寻找最优解。:contentReference[oaicite:2]{index=2}
+## 问题拆解 / Problem Breakdown
 
-## 项目结果
+| 阶段 / Stage | 中文说明 | English description |
+| --- | --- | --- |
+| 输入 / Input | 整理 `实验数据 / Experiments` 及模型所需参数，检查单位、范围和文件位置。 | Prepare the 实验数据 / Experiments and validate units, ranges, and file locations. |
+| 处理 / Process | 通过 `分组回归 / Fit` 将原始问题转换为可计算表示。 | Convert the original problem into a computable representation through 分组回归 / Fit. |
+| 求解 / Solve | 执行 `模型比较 / Select`，保留中间结果以便检查。 | Execute 模型比较 / Select and retain intermediate artifacts for inspection. |
+| 输出 / Output | 生成 `产率优化 / Optimize`，并结合约束解释结果。 | Produce 产率优化 / Optimize and interpret it together with the constraints. |
 
-### 1. 温度关系拟合
+## 方法设计 / Method Design
 
-对 21 组催化剂数据分别进行拟合后，乙醇转化率和 C4 烯烃选择性关于温度的最佳模型大多为**三次多项式模型**，且多数拟合结果的 \(R^2\) 较高，说明模型对实验趋势具有较好的描述能力。:contentReference[oaicite:3]{index=3}
+| # | 方法与作用 / Method and role |
+| ---: | --- |
+| 1 | 多候选回归模型比较 / candidate regression-model comparison |
+| 2 | 催化剂分组拟合 / catalyst-group fitting |
+| 3 | 转化率×选择性的产率优化 / yield optimization from conversion and selectivity |
 
-### 2. 多元回归分析
+这些模块彼此独立但按数据流连接：输入准备负责可计算性，核心算法负责求解，结果层负责把数字转换为可审查的图、表或状态序列。
 
-建立多元线性回归模型后，得到：
+These modules are separated but connected by the data flow: input preparation ensures computability, the core algorithm solves the model, and the output layer turns numbers into inspectable figures, tables, or state sequences.
 
-- 乙醇转化率模型 \(R^2 = 0.7955\)
-- C4 烯烃选择性模型 \(R^2 = 0.7091\)
+## 工作流 / Workflow
 
-结果表明，温度是影响反应结果的重要因素之一，HAP 质量、乙醇浓度和 Co 负载量等变量也对结果有不同程度影响。:contentReference[oaicite:4]{index=4}
+```mermaid
+flowchart LR
+    A["实验数据 / Experiments"] --> B["分组回归 / Fit"] --> C["模型比较 / Select"] --> D["产率优化 / Optimize"]
+```
 
-### 3. 收率优化结果
+## 结果展示 / Results
 
-二次回归模型优于一次模型：
+| <img src="Group_Plots/A1_best_model.png" alt="A1 组最佳模型 / A1 best model" width="100%"><br><sub>A1 组最佳模型 / A1 best model</sub> | <img src="Group_Plots/A1_model_comparison.png" alt="A1 模型比较 / A1 model comparison" width="100%"><br><sub>A1 模型比较 / A1 model comparison</sub> | <img src="C4_Selectivity_Plots/A1_c4_selectivity_best_model.png" alt="C4 选择性拟合 / C4 selectivity fit" width="100%"><br><sub>C4 选择性拟合 / C4 selectivity fit</sub> |
+| --- | --- | --- |
 
-- 一次模型：\(R^2 = 0.6743\)
-- 二次模型：\(R^2 = 0.9156\)
 
-在二次模型下得到的优化结果为：
+**验证摘要 / Verification summary**
 
-- **无温度约束时**
-  - 最优温度：450℃
-  - 最优条件：Co 负载量 0.5 wt%，Co/SiO2 质量 200 mg，HAP 质量 200 mg，乙醇浓度 0.3 ml/min
-  - 预测最大收率：**59.087680%**
+仓库包含 84 张各催化剂组的最佳模型和模型对比图，并保存拟合结果 MAT 文件。 / Includes 84 best-fit and comparison figures plus saved MAT model artifacts.
 
-- **温度 < 350℃ 时**
-  - 最优温度：349.999℃
-  - 最优条件：Co 负载量 3.298176 wt%，Co/SiO2 质量 200 mg，HAP 质量 190.823814 mg，乙醇浓度 2.1 ml/min
-  - 预测最大收率：**25.040384%** :contentReference[oaicite:5]{index=5}
+> 图表来自仓库现有输出或本地实际运行生成；README 不使用虚构指标。
+> Figures are existing project outputs or were generated by an actual local run; no performance metric is fabricated.
 
-## 仓库内容说明
+### 如何阅读结果 / How to Read the Results
 
-当前仓库中主要包含以下内容：
+- 先核对标题、坐标轴、单位和情景标签，再比较曲线、最优值或状态变化。
+- Check titles, axes, units, and scenario labels before comparing curves, optima, or state transitions.
+- 图像用于回答“模型产生了什么”，脚本和数据用于回答“结果如何得到”。
+- Figures answer *what the model produced*; scripts and data answer *how it was produced*.
+- 不同脚本的参数可能服务于不同子问题，跨图比较前应先确认参数口径一致。
+- Parameters may belong to different subtasks; confirm a shared definition before comparing figures.
 
-- `one.m`：问题一相关代码，完成分组处理及温度-指标拟合分析；
-- `two.m`：问题二相关代码，完成多元线性回归与残差分析；
-- `three.m`：问题三相关代码，完成收率建模与优化求解；
-- `catalyst_groups.mat`：分组后的催化剂数据；
-- `model_fitting_results.mat`：乙醇转化率拟合结果；
-- `c4_selectivity_fitting_results.mat`：C4 烯烃选择性拟合结果；
-- `regression_results.mat`：多元回归分析结果；
-- `q3_yield_optimization_regress_only.mat`：问题三优化结果；
-- `Group_Plots/`：温度与乙醇转化率拟合图；
-- `C4_Selectivity_Plots/`：温度与 C4 烯烃选择性拟合图；
-- `附件1.xlsx`：实验数据文件。
+## 项目结构 / Project Map
 
-## 运行环境
+| 路径 / Path | 作用 / Purpose |
+| --- | --- |
+| `one.m` | 温度关系拟合 / temperature fitting |
+| `two.m` | 多元回归 / multivariate regression |
+| `three.m` | 产率优化 / yield optimization |
+| `*.mat` | 模型与结果缓存 / saved model artifacts |
 
-- MATLAB
-- Excel 数据文件输入
-- 主要使用函数：
-  - `xlsread`
-  - `polyfit`
-  - `polyval`
-  - `regress`
-  - `fmincon`（若环境支持）
+## 复现 / Reproduction
 
-## 使用方法
+### 环境 / Environment
 
-1. 将 `附件1.xlsx` 与 `.m` 脚本置于同一目录下；
-2. 在 MATLAB 中打开项目文件夹；
-3. 根据分析需求运行：
-   - `one.m`
-   - `two.m`
-   - `three.m`
-4. 运行后会生成 `.mat` 结果文件和图片输出文件夹。
+- MATLAB 项目建议使用 MATLAB R2025a 或兼容版本；含 `regress`、`linprog` 等函数的脚本可能需要 Statistics and Machine Learning Toolbox 或 Optimization Toolbox。
+- For MATLAB projects, MATLAB R2025a or a compatible release is recommended. Scripts using functions such as `regress` or `linprog` may require the relevant toolbox.
+- 非 MATLAB 项目的额外条件见下面的运行命令与项目文件。
+- For non-MATLAB projects, see the command and project files below for additional requirements.
 
-## 项目特点
+### 快速开始 / Quick Start
 
-- 将化工实验数据问题转化为可计算的统计建模问题；
-- 同时包含拟合、回归、优化三个层面的分析；
-- 输出结果较直观，便于观察不同变量对目标指标的影响；
-- 适合作为 MATLAB 数学建模/回归分析/优化问题的小型项目案例。
+```text
+one; two; three
+```
 
-## 局限性说明
+1. 克隆仓库并保持现有目录结构。 / Clone the repository and preserve its directory structure.
+2. 从仓库根目录或脚本所在目录运行上面的入口。 / Run the entry point from the repository root or the script's own directory.
+3. 若脚本依赖数据文件，请勿移动配套的 CSV、XLSX、MAT 或资源目录。 / Keep companion CSV, XLSX, MAT, and asset files in place.
 
-- 模型主要基于给定实验范围内的数据进行统计拟合，结论对样本范围存在依赖；
-- 回归模型对变量间复杂非线性关系的表达能力有限；
-- 部分最优解位于样本边界附近，存在一定外推风险；
-- 若进一步扩展，可考虑加入更稳健的正则化回归、非线性模型或更多实验数据支持。:contentReference[oaicite:6]{index=6}
+### 复现检查清单 / Reproduction Checklist
 
-## 说明
+| 检查项 / Check | 预期 / Expected |
+| --- | --- |
+| 工作目录 / Working directory | 当前目录能找到入口脚本及其相对路径依赖。 / Entry scripts and relative dependencies resolve correctly. |
+| 依赖 / Dependencies | 所需工具箱、运行时或框架已安装。 / Required toolboxes, runtimes, or frameworks are installed. |
+| 数据 / Data | 文件名、工作表、列顺序和单位未被意外修改。 / Filenames, sheets, column order, and units remain unchanged. |
+| 随机性 / Randomness | 随机项目在对比实验时固定随机种子。 / Randomized projects use a fixed seed for comparisons. |
+| 输出 / Outputs | 控制台无未处理异常，图表或结果文件成功生成。 / No unhandled error appears and expected artifacts are generated. |
 
-本项目为课程/建模分析型项目，重点在于利用 MATLAB 对实验数据进行建模、分析与优化，不作为实际化工生产结论的直接依据。
+## 验证状态 / Validation Status
+
+| 层级 / Layer | 状态 / Status | 说明 / Notes |
+| --- | --- | --- |
+| 仓库结构 / Repository structure | ✅ 已检查 / Checked | 入口、核心源码和配套资源已盘点。 / Entry points, source, and companion assets were inventoried. |
+| README 链接 / README links | ✅ 已检查 / Checked | 本地图片引用已做存在性校验。 / Local image references were checked for existence. |
+| 结果真实性 / Result provenance | ✅ 已检查 / Checked | 仅引用已有输出或实际执行生成的结果。 / Only existing or locally reproduced outputs are shown. |
+| 全环境复现 / Full environment | 见上方摘要 / See summary | 交互、数据库、Unity 或特定工具箱项目可能需要额外环境。 / Interactive, database, Unity, or toolbox-dependent projects may need extra setup. |
+
+## 可扩展方向 / Roadmap Ideas
+
+- 将固定参数集中到配置文件，并为单位、范围和缺失值增加输入校验。
+- Move fixed parameters into configuration files and validate units, ranges, and missing values.
+- 为核心函数增加最小测试用例，覆盖正常、边界和不可行情形。
+- Add small tests for normal, boundary, and infeasible cases.
+- 将关键数值结果同步导出为 CSV/JSON，并自动生成对比图和实验摘要。
+- Export key numeric results to CSV/JSON and generate comparison figures and experiment summaries automatically.
+- 对随机或优化算法记录随机种子、求解器版本、停止条件和运行时间。
+- Record seeds, solver versions, stopping criteria, and runtime for randomized or optimization routines.
+
+## 已知限制 / Known Limits
+
+- 这是学习与研究型项目，参数、数据范围和结论应结合原始场景解释，不宜直接用于生产决策。
+  This is an educational/research project; interpret parameters and conclusions within the original scenario before any real-world use.
+- 部分早期脚本采用交互式输入或固定相对路径；若批处理运行，请先检查入口文件。
+  Some early scripts use interactive input or fixed relative paths; inspect the entry point before automating it.
+
+## 常见问题 / FAQ
+
+**为什么运行后没有图？ / Why is no figure displayed?**
+
+部分入口只输出数值或状态序列；也可能是脚本尚未运行到绘图阶段。先检查控制台，再查看结果目录。
+Some entries produce only numeric or state output. Check the console first, then inspect the result directory.
+
+**为什么结果和 README 略有不同？ / Why do my results differ slightly?**
+
+求解器版本、随机种子、浮点误差、数据版本或交互输入都可能造成差异。请先按复现清单核对环境。
+Solver versions, random seeds, floating-point behavior, data revisions, or interactive inputs can all cause differences.
+
+## 贡献 / Contributing
+
+欢迎通过 Issue 提交复现问题、改进建议或新的对照实验。
+Issues describing reproduction problems, improvements, or additional comparison experiments are welcome.
+
+---
+
+如果这个项目对你有帮助，欢迎 Star。 / If this project is useful, consider giving it a star.
