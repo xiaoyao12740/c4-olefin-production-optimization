@@ -2,7 +2,7 @@
 
 <p align="center"><strong>拟合温度、催化剂组合、乙醇转化率与 C4 烯烃选择性之间的关系，并搜索产率较优的反应条件。</strong><br>A modeling workflow that relates temperature and catalyst formulation to ethanol conversion and C4-olefin selectivity, then searches for favorable yield conditions.</p>
 
-<p align="center">![Tech](https://img.shields.io/badge/stack-MATLAB-2563eb) ![Docs](https://img.shields.io/badge/docs-中文%20%7C%20English-16a34a) ![Status](https://img.shields.io/badge/status-portfolio--ready-f59e0b)</p>
+<p align="center"><img alt="Tech stack" src="https://img.shields.io/badge/stack-MATLAB-2563eb"> <img alt="Documentation language" src="https://img.shields.io/badge/docs-中文%20%7C%20English-16a34a"> <img alt="Project status" src="https://img.shields.io/badge/status-portfolio--ready-f59e0b"></p>
 
 <p align="center"><a href="#中文说明">中文</a> · <a href="#english">English</a> · <a href="#结果展示--results">结果展示 / Results</a> · <a href="#复现--reproduction">复现 / Reproduction</a></p>
 
